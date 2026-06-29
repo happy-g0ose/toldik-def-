@@ -325,6 +325,10 @@ const App = {
 
     // Interactive hover highlights (Claude style)
     initInteractiveHover() {
+        // Prevent layout lag and touch bugs on mobile devices
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        if (isTouchDevice) return;
+
         // Track mouse globally
         window.addEventListener('mousemove', (e) => {
             App.state.mouse.x = e.clientX;
@@ -389,6 +393,16 @@ const App = {
                 btn.style.boxShadow = '';
             });
         });
+    },
+
+    setNavigationEnabled(enabled) {
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.disabled = !enabled;
+            if (!enabled) tab.classList.add('nav-disabled');
+            else tab.classList.remove('nav-disabled');
+        });
+        const burBtn = document.getElementById('btn-burmaldit');
+        if (burBtn) burBtn.disabled = !enabled;
     },
 
     // UI Listeners

@@ -77,6 +77,12 @@ const SlotsGame = {
         this.isSpinning = true;
         document.getElementById("slots-spin-btn").disabled = true;
         document.querySelector(".win-line-indicator").classList.remove("active");
+        
+        App.setNavigationEnabled(false);
+        document.getElementById("slots-bet").disabled = true;
+        document.getElementById("slots-bet-half").disabled = true;
+        document.getElementById("slots-bet-double").disabled = true;
+        document.getElementById("slots-bet-max").disabled = true;
 
         App.updateBalance(-bet);
         App.addBetStat(bet, false, 0);
@@ -138,6 +144,12 @@ const SlotsGame = {
     evaluateResult(bet, results) {
         this.isSpinning = false;
         document.getElementById("slots-spin-btn").disabled = false;
+        
+        App.setNavigationEnabled(true);
+        document.getElementById("slots-bet").disabled = false;
+        document.getElementById("slots-bet-half").disabled = false;
+        document.getElementById("slots-bet-double").disabled = false;
+        document.getElementById("slots-bet-max").disabled = false;
 
         const [r1, r2, r3] = results;
 
@@ -274,6 +286,10 @@ const MinesGame = {
         document.getElementById("mines-cashout-btn").disabled = true; // Wait for first crystal
         betInput.disabled = true;
         bombsSelect.disabled = true;
+        document.getElementById("mines-bet-half").disabled = true;
+        document.getElementById("mines-bet-double").disabled = true;
+        
+        App.setNavigationEnabled(false);
 
         this.generateGrid();
         this.updateMultiplierUI();
@@ -404,6 +420,11 @@ const MinesGame = {
         document.getElementById("mines-cashout-btn").style.display = "none";
         document.getElementById("mines-bet").disabled = false;
         document.getElementById("mines-bombs-count").disabled = false;
+        
+        document.getElementById("mines-bet-half").disabled = false;
+        document.getElementById("mines-bet-double").disabled = false;
+        
+        App.setNavigationEnabled(true);
     }
 };
 
@@ -438,6 +459,12 @@ const CrashGame = {
         this.ctx = this.canvas.getContext("2d");
         this.bindEvents();
         this.enterWaitingState();
+        
+        window.addEventListener("resize", () => {
+            if (document.getElementById("game-crash").classList.contains("active")) {
+                this.onShow();
+            }
+        });
     },
 
     onShow() {
@@ -500,6 +527,10 @@ const CrashGame = {
         document.getElementById("crash-btn-bet").textContent = "Бурмалда Принята";
         document.getElementById("crash-btn-bet").disabled = true;
         betInput.disabled = true;
+        document.getElementById("crash-bet-half").disabled = true;
+        document.getElementById("crash-bet-double").disabled = true;
+        
+        App.setNavigationEnabled(false);
     },
 
     cashout() {
@@ -521,6 +552,11 @@ const CrashGame = {
         document.getElementById("crash-btn-bet").style.display = "block";
         document.getElementById("crash-btn-bet").textContent = "Забрано";
         document.getElementById("crash-btn-bet").disabled = true;
+        
+        document.getElementById("crash-bet-half").disabled = false;
+        document.getElementById("crash-bet-double").disabled = false;
+        
+        App.setNavigationEnabled(true);
     },
 
     generateCrashPoint() {
@@ -552,7 +588,13 @@ const CrashGame = {
             document.getElementById("crash-btn-bet").style.display = "block";
             document.getElementById("crash-btn-cashout").style.display = "none";
             document.getElementById("crash-bet").disabled = false;
+            
+            document.getElementById("crash-bet-half").disabled = false;
+            document.getElementById("crash-bet-double").disabled = false;
+            
             this.betPlacedThisRound = false;
+            
+            App.setNavigationEnabled(true);
         }
 
         this.startLoop();
@@ -593,8 +635,13 @@ const CrashGame = {
         document.getElementById("crash-btn-bet").disabled = true;
         document.getElementById("crash-btn-bet").textContent = "КРАШНУЛО";
 
+        document.getElementById("crash-bet-half").disabled = false;
+        document.getElementById("crash-bet-double").disabled = false;
+        
         this.betPlacedThisRound = false;
         this.betActive = false;
+        
+        App.setNavigationEnabled(true);
 
         // Auto restart after 4 seconds
         setTimeout(() => {
@@ -603,7 +650,17 @@ const CrashGame = {
     },
 
     startLoop() {
-        if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            clearTimeout(this.animationFrameId);
+        }
+        
+        // Prevent background loop when tab is hidden
+        const isVisible = document.getElementById("game-crash").classList.contains("active");
+        if (!isVisible) {
+            this.animationFrameId = setTimeout(() => this.startLoop(), 1000);
+            return;
+        }
         
         const loop = (time) => {
             this.update(time);
@@ -863,6 +920,11 @@ const WheelGame = {
         this.isSpinning = true;
         document.getElementById("wheel-spin-btn").disabled = true;
         
+        App.setNavigationEnabled(false);
+        document.getElementById("wheel-bet-half").disabled = true;
+        document.getElementById("wheel-bet-double").disabled = true;
+        document.getElementById("wheel-bet").disabled = true;
+        
         App.updateBalance(-bet);
         App.addBetStat(bet, false, 0);
         
@@ -912,6 +974,11 @@ const WheelGame = {
     evaluateResult(bet, targetIdx) {
         this.isSpinning = false;
         document.getElementById("wheel-spin-btn").disabled = false;
+        
+        App.setNavigationEnabled(true);
+        document.getElementById("wheel-bet-half").disabled = false;
+        document.getElementById("wheel-bet-double").disabled = false;
+        document.getElementById("wheel-bet").disabled = false;
         
         // Reset wheel rotation in styling without transition
         const arcDegrees = 360 / this.sectors.length;

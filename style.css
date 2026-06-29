@@ -588,6 +588,13 @@ input[type="number"]:focus, select:focus {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+.nav-tab:disabled, .nav-disabled {
+    opacity: 0.35 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
 
 .nav-tab i {
     font-size: 1.1rem;
