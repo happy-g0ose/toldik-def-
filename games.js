@@ -415,7 +415,7 @@ const MinesGame = {
     },
 
     resetControls() {
-        document.getElementById("mines-start-btn").textContent = "Бурмалдить Шахты";
+        document.getElementById("mines-start-btn").textContent = "Бурмалдить";
         document.getElementById("mines-start-btn").disabled = false;
         document.getElementById("mines-cashout-btn").style.display = "none";
         document.getElementById("mines-bet").disabled = false;
@@ -584,7 +584,7 @@ const CrashGame = {
         
         if (!this.betActive) {
             document.getElementById("crash-btn-bet").disabled = false;
-            document.getElementById("crash-btn-bet").textContent = "Бурмалдить Полет";
+            document.getElementById("crash-btn-bet").textContent = "Бурмалдить";
             document.getElementById("crash-btn-bet").style.display = "block";
             document.getElementById("crash-btn-cashout").style.display = "none";
             document.getElementById("crash-bet").disabled = false;
