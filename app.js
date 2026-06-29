@@ -10,7 +10,8 @@ const App = {
         totalBets: 0,
         soundEnabled: true,
         reactorCharging: false,
-        audioCtx: null
+        audioCtx: null,
+        mouse: { x: null, y: null, active: false }
     },
 
     // Audio Synthesizer via Web Audio API
@@ -146,6 +147,7 @@ const App = {
     init() {
         this.loadSettings();
         this.initCanvasBackground();
+        this.initInteractiveHover();
         this.initEventListeners();
         this.startLiveFeedSimulation();
         this.updateStatsUI();
@@ -257,7 +259,7 @@ const App = {
         let h = (canvas.height = window.innerHeight);
 
         const stars = [];
-        const starCount = 100;
+        const starCount = 80; // slightly fewer to keep performance smooth
 
         for (let i = 0; i < starCount; i++) {
             stars.push({
@@ -275,9 +277,8 @@ const App = {
             h = canvas.height = window.innerHeight;
         });
 
-        function animate() {
+        const animate = () => {
             ctx.clearRect(0, 0, w, h);
-            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
             
             for (let i = 0; i < starCount; i++) {
                 const s = stars[i];
@@ -296,9 +297,23 @@ const App = {
                 if (s.alpha < 0.1) s.alpha = 0.1;
                 if (s.alpha > 0.9) s.alpha = 0.9;
 
+                let tx = s.x;
+                let ty = s.y;
+
+                if (App.state.mouse.active) {
+                    const dx = App.state.mouse.x - s.x;
+                    const dy = App.state.mouse.y - s.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 180) {
+                        const force = (180 - dist) / 180;
+                        tx += (dx / dist) * force * 15;
+                        ty += (dy / dist) * force * 15;
+                    }
+                }
+
                 ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
                 ctx.beginPath();
-                ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                ctx.arc(tx, ty, s.size, 0, Math.PI * 2);
                 ctx.fill();
             }
 
@@ -306,6 +321,74 @@ const App = {
         }
 
         animate();
+    },
+
+    // Interactive hover highlights (Claude style)
+    initInteractiveHover() {
+        // Track mouse globally
+        window.addEventListener('mousemove', (e) => {
+            App.state.mouse.x = e.clientX;
+            App.state.mouse.y = e.clientY;
+            App.state.mouse.active = true;
+            
+            // Parallax aurora background waves
+            const px = (e.clientX - window.innerWidth / 2) / 35;
+            const py = (e.clientY - window.innerHeight / 2) / 35;
+            document.querySelectorAll('.aurora-glow').forEach((glow, idx) => {
+                const speed = (idx + 1) * 0.4;
+                glow.style.transform = `translate(${px * speed}px, ${py * speed}px)`;
+            });
+        });
+
+        window.addEventListener('mouseleave', () => {
+            App.state.mouse.active = false;
+        });
+
+        // 3D Card Tilt + Spotlight tracking
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+
+                // 3D rotation angle
+                const xc = rect.width / 2;
+                const yc = rect.height / 2;
+                const dx = x - xc;
+                const dy = y - yc;
+                const rx = -(dy / yc) * 4; // limit rotation to 4deg
+                const ry = (dx / xc) * 4;
+
+                // Apply transition transforms
+                card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-2px)`;
+                card.style.boxShadow = `0 20px 45px rgba(0, 0, 0, 0.25)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+                card.style.boxShadow = '';
+            });
+        });
+
+        // Magnetic pill buttons (slight drifting towards mouse pointer)
+        document.querySelectorAll('.btn, .nav-tab, .bet-adjust-btn').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                btn.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px) scale(1.02)`;
+                btn.style.boxShadow = `0 8px 20px rgba(0, 0, 0, 0.3)`;
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = '';
+                btn.style.boxShadow = '';
+            });
+        });
     },
 
     // UI Listeners
