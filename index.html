@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>toldik def | Космическое Малахитовое Казино</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Cosmic Aurora Background -->
+    <div class="space-bg">
+        <canvas id="stars-canvas"></canvas>
+        <div class="aurora-glow purple"></div>
+        <div class="aurora-glow teal"></div>
+        <div class="aurora-glow malachite"></div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="main-header glass-card">
+            <div class="logo-area">
+                <span class="logo-icon"><i class="fa-solid fa-shuttle-space"></i></span>
+                <h1 class="logo-text">toldik <span class="accent-text">def</span></h1>
+            </div>
+            
+            <div class="header-controls">
+                <div class="balance-display glass-card">
+                    <span class="balance-label">Баланс:</span>
+                    <span class="balance-amount" id="balance-val">1000</span>
+                    <span class="currency-symbol">TC</span>
+                </div>
+                
+                <button class="btn btn-primary glow-btn-malachite" id="btn-burmaldit">
+                    <i class="fa-solid fa-bolt-lightning"></i> Бурмалдить
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="main-workspace">
+            
+            <!-- Sidebar (Statistics & Simulated Live Feed) -->
+            <aside class="sidebar glass-card">
+                <div class="sidebar-section">
+                    <h3><i class="fa-solid fa-satellite"></i> Статистика сессии</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-num win-color" id="stat-wins">0</span>
+                            <span class="stat-label">Победы</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-num loss-color" id="stat-losses">0</span>
+                            <span class="stat-label">Проигрыши</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-num" id="stat-total-bets">0</span>
+                            <span class="stat-label">Ставок (TC)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section flex-grow">
+                    <h3><i class="fa-solid fa-tower-broadcast"></i> Трансляция Бурмалды</h3>
+                    <div class="live-feed" id="live-bets-feed">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <div class="sidebar-footer">
+                    <button class="settings-btn" id="toggle-sound" title="Вкл/Выкл звук">
+                        <i class="fa-solid fa-volume-high" id="sound-icon"></i> Звуки
+                    </button>
+                    <div class="credits">
+                        <span>toldik def &copy; 2026</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content (Games & Nav) -->
+            <section class="content-area">
+                <!-- Navigation Tabs -->
+                <nav class="game-nav glass-card">
+                    <button class="nav-tab active" data-game="slots">
+                        <i class="fa-solid fa-cubes"></i> Слоты
+                    </button>
+                    <button class="nav-tab" data-game="mines">
+                        <i class="fa-solid fa-gem"></i> Шахты
+                    </button>
+                    <button class="nav-tab" data-game="crash">
+                        <i class="fa-solid fa-rocket"></i> Краш
+                    </button>
+                    <button class="nav-tab" data-game="wheel">
+                        <i class="fa-solid fa-circle-notch"></i> Колесо
+                    </button>
+                </nav>
+
+                <!-- Game Container -->
+                <div class="game-window glass-card">
+                    
+                    <!-- GAME 1: SLOTS -->
+                    <div class="game-view active" id="game-slots">
+                        <div class="slots-container">
+                            <div class="slots-header">
+                                <h2>Космические Слоты</h2>
+                                <p>Собери линию одинаковых космических тел или редкий Малахит!</p>
+                            </div>
+                            
+                            <div class="slots-machine">
+                                <div class="slots-reels-container">
+                                    <div class="reel" id="reel-1">
+                                        <div class="reel-inner"></div>
+                                    </div>
+                                    <div class="reel" id="reel-2">
+                                        <div class="reel-inner"></div>
+                                    </div>
+                                    <div class="reel" id="reel-3">
+                                        <div class="reel-inner"></div>
+                                    </div>
+                                </div>
+                                <div class="win-line-indicator"></div>
+                            </div>
+
+                            <div class="game-controls">
+                                <div class="bet-controls">
+                                    <label for="slots-bet">Ставка:</label>
+                                    <input type="number" id="slots-bet" min="10" max="10000" value="100">
+                                    <button class="bet-adjust-btn" id="slots-bet-half">1/2</button>
+                                    <button class="bet-adjust-btn" id="slots-bet-double">x2</button>
+                                    <button class="bet-adjust-btn" id="slots-bet-max">MAX</button>
+                                </div>
+                                <button class="btn btn-action glow-btn-malachite" id="slots-spin-btn">Бурмалдить Слоты</button>
+                            </div>
+
+                            <div class="payout-table glass-card">
+                                <h4>Таблица множителей:</h4>
+                                <div class="payout-grid">
+                                    <span>🌌 Чёрная Дыра x2</span>
+                                    <span>🪐 Сатурн x3</span>
+                                    <span>⭐ Звезда x5</span>
+                                    <span>☄️ Комета x8</span>
+                                    <span>💎 Малахит x15</span>
+                                    <span>🛸 UFO x30</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GAME 2: MINES -->
+                    <div class="game-view" id="game-mines">
+                        <div class="mines-layout">
+                            <div class="mines-control-panel glass-card">
+                                <h2>Малахитовые Шахты</h2>
+                                <p>Найди кристаллы на поле, избегая космических аномалий!</p>
+                                
+                                <div class="control-group">
+                                    <label>Ставка (TC)</label>
+                                    <input type="number" id="mines-bet" min="10" max="10000" value="100">
+                                    <div class="quick-bets">
+                                        <button class="bet-adjust-btn" id="mines-bet-half">1/2</button>
+                                        <button class="bet-adjust-btn" id="mines-bet-double">x2</button>
+                                    </div>
+                                </div>
+
+                                <div class="control-group">
+                                    <label>Аномалий (Мины)</label>
+                                    <select id="mines-bombs-count">
+                                        <option value="1">1</option>
+                                        <option value="3" selected>3</option>
+                                        <option value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="15">15</option>
+                                        <option value="20">20</option>
+                                        <option value="24">24</option>
+                                    </select>
+                                </div>
+
+                                <div class="next-step-info">
+                                    <div class="info-row">
+                                        <span class="info-label">Множитель:</span>
+                                        <span class="info-val" id="mines-multiplier">1.00x</span>
+                                    </div>
+                                    <div class="info-row">
+                                        <span class="info-label">Выигрыш:</span>
+                                        <span class="info-val win-color" id="mines-profit">0 TC</span>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-action glow-btn-malachite" id="mines-start-btn">Бурмалдить Шахты</button>
+                                <button class="btn btn-success" id="mines-cashout-btn" style="display: none;">Забрать</button>
+                            </div>
+                            
+                            <div class="mines-board-container">
+                                <div class="mines-board" id="mines-grid">
+                                    <!-- 25 tiles will be spawned by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GAME 3: CRASH -->
+                    <div class="game-view" id="game-crash">
+                        <div class="crash-layout">
+                            <div class="crash-controls glass-card">
+                                <h2>Космический Краш</h2>
+                                <p>Космолет взлетает вверх. Успей забрать ставку, пока он не прыгнул в гиперпространство!</p>
+                                
+                                <div class="control-group">
+                                    <label>Ставка (TC)</label>
+                                    <input type="number" id="crash-bet" min="10" max="10000" value="100">
+                                    <div class="quick-bets">
+                                        <button class="bet-adjust-btn" id="crash-bet-half">1/2</button>
+                                        <button class="bet-adjust-btn" id="crash-bet-double">x2</button>
+                                    </div>
+                                </div>
+
+                                <div class="crash-game-status">
+                                    <span class="status-title">Статус полета:</span>
+                                    <span class="status-desc" id="crash-state-desc">Ожидание ставок</span>
+                                </div>
+
+                                <button class="btn btn-action glow-btn-malachite" id="crash-btn-bet">Бурмалдить Полет</button>
+                                <button class="btn btn-success" id="crash-btn-cashout" style="display: none;">Забрать ставку</button>
+                            </div>
+
+                            <div class="crash-canvas-container glass-card">
+                                <canvas id="crash-canvas" width="600" height="400"></canvas>
+                                <div class="crash-multiplier-overlay" id="crash-mult-display">1.00x</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GAME 4: WHEEL -->
+                    <div class="game-view" id="game-wheel">
+                        <div class="wheel-layout">
+                            <div class="wheel-controls-pane glass-card">
+                                <h2>Колесо Бурмалды</h2>
+                                <p>Испытай удачу на квантовом колесе! Простые правила, мгновенный результат.</p>
+                                
+                                <div class="control-group">
+                                    <label>Ставка (TC)</label>
+                                    <input type="number" id="wheel-bet" min="10" max="10000" value="100">
+                                    <div class="quick-bets">
+                                        <button class="bet-adjust-btn" id="wheel-bet-half">1/2</button>
+                                        <button class="bet-adjust-btn" id="wheel-bet-double">x2</button>
+                                    </div>
+                                </div>
+                                
+                                <button class="btn btn-action glow-btn-malachite" id="wheel-spin-btn">Бурмалдить Колесо</button>
+                            </div>
+
+                            <div class="wheel-visual-wrapper">
+                                <div class="wheel-pointer">▼</div>
+                                <div class="wheel-outer">
+                                    <canvas id="wheel-canvas" width="450" height="450"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- "Бурмалдить" Modal (Deposit Portal) -->
+    <div class="modal-overlay" id="burmaldit-modal">
+        <div class="modal-content glass-card">
+            <button class="close-modal-btn" id="close-burmaldit"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <h2>Квантовый реактор Бурмалды</h2>
+                <p>Запусти генерацию толдиккоинов прямо из космической сингулярности!</p>
+            </div>
+            <div class="reactor-container">
+                <div class="reactor-core" id="reactor-core">
+                    <div class="reactor-ring outer"></div>
+                    <div class="reactor-ring middle"></div>
+                    <div class="reactor-ring inner"></div>
+                    <div class="reactor-center"><i class="fa-solid fa-atom"></i></div>
+                </div>
+                <div class="charging-bar-container">
+                    <div class="charging-bar" id="reactor-charge-bar"></div>
+                </div>
+                <div class="reactor-status" id="reactor-status-text">Готов к инициации бурмалдения...</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-large glow-btn-malachite" id="btn-trigger-burmalda">
+                    <i class="fa-solid fa-bolt-lightning"></i> БУРМАЛДИТЬ!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification system toast -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- JS Files -->
+    <script src="app.js"></script>
+    <script src="games.js"></script>
+</body>
+</html>

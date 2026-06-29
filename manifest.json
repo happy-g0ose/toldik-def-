@@ -1,0 +1,10 @@
+{
+  "short_name": "toldik def",
+  "name": "toldik def | Космическое Малахитовое Казино",
+  "icons": [],
+  "start_url": ".",
+  "background_color": "#06050b",
+  "theme_color": "#00e676",
+  "display": "standalone",
+  "orientation": "portrait"
+}
