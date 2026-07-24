@@ -45,11 +45,11 @@ const SlotsGame = {
         // Quick Bet Adjustments
         document.getElementById("slots-bet-half").addEventListener("click", () => {
             App.audio.playClick();
-            betInput.value = Math.max(10, Math.floor(parseInt(betInput.value, 10) / 2));
+            betInput.value = Math.max(10, Math.floor(Number(betInput.value) / 2));
         });
         document.getElementById("slots-bet-double").addEventListener("click", () => {
             App.audio.playClick();
-            betInput.value = Math.min(App.state.balance, parseInt(betInput.value, 10) * 2);
+            betInput.value = Math.min(App.state.balance, Math.floor(Number(betInput.value) * 2));
         });
         document.getElementById("slots-bet-max").addEventListener("click", () => {
             App.audio.playClick();
@@ -59,7 +59,7 @@ const SlotsGame = {
         spinBtn.addEventListener("click", () => {
             if (this.isSpinning) return;
             
-            const bet = parseInt(betInput.value, 10);
+            const bet = Math.floor(Number(betInput.value));
             if (isNaN(bet) || bet <= 0) {
                 App.showToast("Ошибка", "Введите корректную сумму ставки.", "loss");
                 return;
@@ -270,12 +270,12 @@ const MinesGame = {
         document.getElementById("mines-bet-half").addEventListener("click", () => {
             if (this.active) return;
             App.audio.playClick();
-            betInput.value = Math.max(10, Math.floor(parseInt(betInput.value, 10) / 2));
+            betInput.value = Math.max(10, Math.floor(Number(betInput.value) / 2));
         });
         document.getElementById("mines-bet-double").addEventListener("click", () => {
             if (this.active) return;
             App.audio.playClick();
-            betInput.value = Math.min(App.state.balance, parseInt(betInput.value, 10) * 2);
+            betInput.value = Math.min(App.state.balance, Math.floor(Number(betInput.value) * 2));
         });
 
         startBtn.addEventListener("click", () => {
@@ -293,7 +293,7 @@ const MinesGame = {
         const betInput = document.getElementById("mines-bet");
         const bombsSelect = document.getElementById("mines-bombs-count");
         
-        this.bet = parseInt(betInput.value, 10);
+        this.bet = Math.floor(Number(betInput.value));
         this.bombsCount = parseInt(bombsSelect.value, 10);
 
         if (isNaN(this.bet) || this.bet <= 0) {
@@ -533,12 +533,12 @@ const CrashGame = {
         document.getElementById("crash-bet-half").addEventListener("click", () => {
             if (this.betPlacedThisRound) return;
             App.audio.playClick();
-            betInput.value = Math.max(10, Math.floor(parseInt(betInput.value, 10) / 2));
+            betInput.value = Math.max(10, Math.floor(Number(betInput.value) / 2));
         });
         document.getElementById("crash-bet-double").addEventListener("click", () => {
             if (this.betPlacedThisRound) return;
             App.audio.playClick();
-            betInput.value = Math.min(App.state.balance, parseInt(betInput.value, 10) * 2);
+            betInput.value = Math.min(App.state.balance, Math.floor(Number(betInput.value) * 2));
         });
 
         betBtn.addEventListener("click", () => {
@@ -553,7 +553,7 @@ const CrashGame = {
     placeBet() {
         if (this.betPlacedThisRound) return;
         const betInput = document.getElementById("crash-bet");
-        const amt = parseInt(betInput.value, 10);
+        const amt = Math.floor(Number(betInput.value));
 
         if (isNaN(amt) || amt <= 0) {
             App.showToast("Ошибка", "Введите корректную ставку.", "loss");
@@ -944,18 +944,18 @@ const WheelGame = {
         document.getElementById("wheel-bet-half").addEventListener("click", () => {
             if (this.isSpinning) return;
             App.audio.playClick();
-            betInput.value = Math.max(10, Math.floor(parseInt(betInput.value, 10) / 2));
+            betInput.value = Math.max(10, Math.floor(Number(betInput.value) / 2));
         });
         document.getElementById("wheel-bet-double").addEventListener("click", () => {
             if (this.isSpinning) return;
             App.audio.playClick();
-            betInput.value = Math.min(App.state.balance, parseInt(betInput.value, 10) * 2);
+            betInput.value = Math.min(App.state.balance, Math.floor(Number(betInput.value) * 2));
         });
 
         spinBtn.addEventListener("click", () => {
             if (this.isSpinning) return;
             
-            const bet = parseInt(betInput.value, 10);
+            const bet = Math.floor(Number(betInput.value));
             if (isNaN(bet) || bet <= 0) {
                 App.showToast("Ошибка", "Введите корректную ставку.", "loss");
                 return;

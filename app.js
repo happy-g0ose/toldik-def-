@@ -430,7 +430,7 @@ const App = {
 
         const savedBalance = localStorage.getItem("toldik_def_balance");
         if (savedBalance !== null) {
-            this.state.balance = parseInt(savedBalance, 10);
+            this.state.balance = Number(savedBalance);
         } else {
             localStorage.setItem("toldik_def_balance", this.state.balance);
         }
@@ -442,11 +442,11 @@ const App = {
         this.updateSoundIcon();
 
         const savedWins = localStorage.getItem("toldik_def_wins");
-        if (savedWins !== null) this.state.wins = parseInt(savedWins, 10);
+        if (savedWins !== null) this.state.wins = Number(savedWins);
         const savedLosses = localStorage.getItem("toldik_def_losses");
-        if (savedLosses !== null) this.state.losses = parseInt(savedLosses, 10);
+        if (savedLosses !== null) this.state.losses = Number(savedLosses);
         const savedTotalBets = localStorage.getItem("toldik_def_total_bets");
-        if (savedTotalBets !== null) this.state.totalBets = parseInt(savedTotalBets, 10);
+        if (savedTotalBets !== null) this.state.totalBets = Number(savedTotalBets);
         
         const savedUpgrades = localStorage.getItem("toldik_def_upgrades");
         if (savedUpgrades !== null) {
