@@ -92,13 +92,24 @@ const SlotsGame = {
         let r2Sym = this.symbols[Math.floor(Math.random() * this.symbols.length)];
         let r3Sym = this.symbols[Math.floor(Math.random() * this.symbols.length)];
 
-        const luckLvl = App.state.upgrades.luck || 0;
-        if (luckLvl > 0 && Math.random() < (luckLvl * 0.05)) {
-            if (r1Sym.char === r2Sym.char) r3Sym = r1Sym;
-            else if (r2Sym.char === r3Sym.char) r1Sym = r2Sym;
-            else if (r1Sym.char === r3Sym.char) r2Sym = r1Sym;
-            else {
-                r2Sym = r1Sym; // force at least a pair
+        let luckLvl = App.state.upgrades.luck || 0;
+        if (App.state.pahanMode) luckLvl = 1000000;
+
+        if (luckLvl > 0 && (App.state.pahanMode || Math.random() < (luckLvl * 0.05))) {
+            if (App.state.pahanMode) {
+                // Force triple high-tier symbols (UFO or Malachite) in Pahan Mode
+                const premiumSymbols = this.symbols.filter(s => s.mult >= 15);
+                const chosen = premiumSymbols[Math.floor(Math.random() * premiumSymbols.length)];
+                r1Sym = chosen;
+                r2Sym = chosen;
+                r3Sym = chosen;
+            } else {
+                if (r1Sym.char === r2Sym.char) r3Sym = r1Sym;
+                else if (r2Sym.char === r3Sym.char) r1Sym = r2Sym;
+                else if (r1Sym.char === r3Sym.char) r2Sym = r1Sym;
+                else {
+                    r2Sym = r1Sym; // force at least a pair
+                }
             }
         }
 
@@ -349,7 +360,7 @@ const MinesGame = {
 
         if (this.grid[idx] === "bomb") {
             const luckLvl = App.state.upgrades.luck || 0;
-            if (luckLvl > 0 && Math.random() < (luckLvl * 0.025)) {
+            if (App.state.pahanMode || (luckLvl > 0 && Math.random() < (luckLvl * 0.025))) {
                 this.grid[idx] = "crystal";
                 App.showToast("Удача!", "Космическое Везение обезвредило черную дыру!", "win");
                 App.audio.playTone(800, 'sine', 0.15);

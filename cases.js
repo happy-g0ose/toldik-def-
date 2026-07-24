@@ -117,6 +117,10 @@ const CasesGame = {
         const lossBoost = 1 + Math.floor(losses / 100) * 0.2;
         luckLvl = luckLvl * winBoost * lossBoost;
 
+        if (App.state.pahanMode) {
+            luckLvl = Math.max(luckLvl, 1) * 1000000; // x1,000,000 Luck for Pahan Mode!
+        }
+
         // Rarity weights adjust dynamically (better odds with higher luck level)
         let weights = {
             common: Math.max(10, 50 - luckLvl * 6),
