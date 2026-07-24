@@ -72,6 +72,13 @@
                     </div>
                 </div>
 
+                <div class="sidebar-section" id="sidebar-luxury-section" style="display: none; border: 1px solid rgba(255, 215, 0, 0.2); background: rgba(255, 215, 0, 0.02);">
+                    <h3 style="color: #ffd700;"><i class="fa-solid fa-crown"></i> Имущество Пахана</h3>
+                    <div class="luxury-badges" id="sidebar-luxury-badges" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
                 <div class="sidebar-section flex-grow">
                     <h3><i class="fa-solid fa-tower-broadcast"></i> Трансляция Бурмалды</h3>
                     <div class="live-feed" id="live-bets-feed">
@@ -285,6 +292,17 @@
                         <div class="upgrades-grid" id="upgrades-grid">
                             <!-- Populated by JS -->
                         </div>
+
+                        <!-- Luxury Broker section (active only in pahanMode or when balance > 1M) -->
+                        <div class="luxury-section" id="luxury-store-section" style="margin-top: 40px; border-top: 1px solid rgba(255, 215, 0, 0.2); padding-top: 30px; display: none;">
+                            <div class="slots-header">
+                                <h2 style="background: linear-gradient(90deg, #ffd700, #ff8f00); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">👑 Элитный Малахитовый Рынок</h2>
+                                <p>Куда пахану тратить секстиллионы толдиккоинов? Скупайте элитную недвижимость во Вселенной!</p>
+                            </div>
+                            <div class="upgrades-grid" id="luxury-grid">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
                     </div>
 
                     <!-- GAME 6: CASES -->
@@ -375,8 +393,8 @@
     <div id="toast-container" class="toast-container"></div>
 
     <!-- JS Files -->
-    <script src="app.js?v=5"></script>
-    <script src="games.js?v=5"></script>
-    <script src="cases.js?v=5"></script>
+    <script src="app.js?v=6"></script>
+    <script src="games.js?v=6"></script>
+    <script src="cases.js?v=6"></script>
 </body>
 </html>

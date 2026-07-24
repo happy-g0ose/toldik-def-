@@ -24,7 +24,8 @@ const App = {
             discount: 0,
             cashback: 0
         },
-        inventory: []
+        inventory: [],
+        luxury: {}
     },
 
     upgradesConfig: {
@@ -37,6 +38,15 @@ const App = {
         miner: { name: "Квантовый Майнер", desc: "Генерирует TC пассивно каждую секунду", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>' },
         discount: { name: "Кейсовая Скидка", desc: "Уменьшает стоимость открытия кейсов", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>' },
         cashback: { name: "Звездный Кэшбэк", desc: "Возвращает часть проигранных ставок", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>' }
+    },
+
+    luxuryConfig: {
+        yacht: { name: "Яхта Толдика", price: 1000000000, desc: "Роскошная супер-яхта с бассейном из ToldikCoins", icon: "🚢" },
+        villa: { name: "Вилла на Плутоне", price: 100000000000, desc: "Огромное поместье с видом на метановые ледники", icon: "🏰" },
+        planet: { name: "Малахитовая Планета", price: 10000000000000, desc: "Целая космическая сфера из малахитового камня", icon: "🪐" },
+        blackhole: { name: "Своя Чёрная Дыра", price: 100000000000000000, desc: "Личный космический портал для утилизации лишней массы", icon: "🌀" },
+        empire: { name: "Галактическая Империя", price: 10000000000000000000000, desc: "Абсолютная власть над миллионом цивилизаций", icon: "👑" },
+        matrix: { name: "Симуляция Вселенной", price: 1000000000000000000000000, desc: "Вы покупаете этот виртуальный мир. Всё сущее теперь ваше.", icon: "🌌" }
     },
 
     itemsCatalog: {
@@ -375,6 +385,7 @@ const App = {
         this.startLiveFeedSimulation();
         this.updateStatsUI();
         this.renderUpgradesUI();
+        this.renderLuxuryUI();
         
         // Passive income miner loop (generates TC every second)
         setInterval(() => {
@@ -449,6 +460,15 @@ const App = {
                 console.error("Failed to parse inventory", e);
             }
         }
+
+        const savedLuxury = localStorage.getItem("toldik_def_luxury");
+        if (savedLuxury !== null) {
+            try {
+                this.state.luxury = JSON.parse(savedLuxury);
+            } catch (e) {
+                console.error("Failed to parse luxury", e);
+            }
+        }
         
         this.updateBalanceUI();
         this.updateInventoryCountUI();
@@ -461,6 +481,7 @@ const App = {
         localStorage.setItem("toldik_def_total_bets", this.state.totalBets);
         localStorage.setItem("toldik_def_upgrades", JSON.stringify(this.state.upgrades));
         localStorage.setItem("toldik_def_inventory", JSON.stringify(this.state.inventory));
+        localStorage.setItem("toldik_def_luxury", JSON.stringify(this.state.luxury));
     },
 
     updateBalance(change) {
@@ -496,10 +517,13 @@ const App = {
     updateBalanceUI() {
         const el = document.getElementById("balance-val");
         if (el) {
-            // Animating number change
-            const startVal = parseInt(el.textContent.replace(/,/g, ''), 10) || 0;
+            const startVal = parseFloat(el.textContent.replace(/,/g, '')) || 0;
             const endVal = this.state.balance;
-            this.animateNumber(el, startVal, endVal, 500);
+            if (endVal > 1e12) {
+                el.textContent = this.formatBigNumber(endVal);
+            } else {
+                this.animateNumber(el, startVal, endVal, 500);
+            }
         }
     },
 
@@ -750,6 +774,7 @@ const App = {
                 }
                 if (gameName === "upgrades") {
                     this.renderUpgradesUI();
+                    this.renderLuxuryUI();
                 }
             });
         });
@@ -949,6 +974,105 @@ const App = {
                 container.removeChild(toast);
             }
         }, 4000);
+    },
+
+    formatBigNumber(num) {
+        if (num >= 1e24) return (num / 1e24).toFixed(2) + " септиллионов";
+        if (num >= 1e21) return (num / 1e21).toFixed(2) + " секстиллионов";
+        if (num >= 1e18) return (num / 1e18).toFixed(2) + " квинтиллионов";
+        if (num >= 1e15) return (num / 1e15).toFixed(2) + " квадриллионов";
+        if (num >= 1e12) return (num / 1e12).toFixed(2) + " триллионов";
+        if (num >= 1e9) return (num / 1e9).toFixed(2) + " млрд";
+        if (num >= 1e6) return (num / 1e6).toFixed(2) + " млн";
+        return num.toLocaleString();
+    },
+
+    renderLuxuryUI() {
+        const storeSection = document.getElementById("luxury-store-section");
+        const sidebarSection = document.getElementById("sidebar-luxury-section");
+        if (!storeSection || !sidebarSection) return;
+
+        const showLuxury = this.state.pahanMode || this.state.balance > 500000000 || Object.keys(this.state.luxury).length > 0;
+        if (showLuxury) {
+            storeSection.style.display = "block";
+            sidebarSection.style.display = "block";
+        } else {
+            storeSection.style.display = "none";
+            sidebarSection.style.display = "none";
+            return;
+        }
+
+        // Render Upgrades Grid
+        const grid = document.getElementById("luxury-grid");
+        if (grid) {
+            grid.innerHTML = "";
+            for (const [id, item] of Object.entries(this.luxuryConfig)) {
+                const isBought = this.state.luxury[id] === true;
+                const card = document.createElement("div");
+                card.className = `upgrade-card glass-card ${isBought ? 'bought' : ''}`;
+                
+                let displayPrice = this.formatBigNumber(item.price);
+                
+                card.innerHTML = `
+                    <div class="upgrade-icon" style="font-size: 2.2rem; display: flex; align-items: center; justify-content: center; background: rgba(255,215,0,0.1); border-radius: 12px; width: 60px; height: 60px;">${item.icon}</div>
+                    <div class="upgrade-info" style="flex-grow: 1;">
+                        <h3>${item.name}</h3>
+                        <p class="upgrade-desc" style="font-size: 0.85rem; opacity: 0.7; margin-top: 4px;">${item.desc}</p>
+                    </div>
+                    <button class="btn btn-action ${isBought ? 'disabled' : ''}" onclick="App.buyLuxuryItem('${id}')" ${isBought ? 'disabled' : ''} style="margin-left: auto; min-width: 140px; font-size: 0.85rem;">
+                        ${isBought ? 'ВЛАДЕЛЕЦ 👑' : displayPrice}
+                    </button>
+                `;
+                grid.appendChild(card);
+            }
+        }
+
+        // Render Sidebar Badges
+        const badgesContainer = document.getElementById("sidebar-luxury-badges");
+        if (badgesContainer) {
+            badgesContainer.innerHTML = "";
+            let boughtAny = false;
+            for (const [id, item] of Object.entries(this.luxuryConfig)) {
+                if (this.state.luxury[id]) {
+                    boughtAny = true;
+                    const badge = document.createElement("span");
+                    badge.className = "badge";
+                    badge.style.background = "linear-gradient(135deg, #ffd700, #ff8f00)";
+                    badge.style.color = "#000";
+                    badge.style.padding = "6px 10px";
+                    badge.style.borderRadius = "8px";
+                    badge.style.fontSize = "0.75rem";
+                    badge.style.fontWeight = "750";
+                    badge.style.border = "1px solid #ffab00";
+                    badge.style.display = "inline-flex";
+                    badge.style.alignItems = "center";
+                    badge.style.gap = "4px";
+                    badge.style.boxShadow = "0 4px 10px rgba(255, 215, 0, 0.2)";
+                    badge.innerHTML = `<span>${item.icon}</span> <span>${item.name}</span>`;
+                    badgesContainer.appendChild(badge);
+                }
+            }
+            if (!boughtAny) {
+                badgesContainer.innerHTML = `<span style="font-size: 0.75rem; color: var(--color-text-muted);">Имущества пока нет. Приобретите в Улучшениях!</span>`;
+            }
+        }
+    },
+
+    buyLuxuryItem(id) {
+        const item = this.luxuryConfig[id];
+        if (!item || this.state.luxury[id]) return;
+
+        if (this.state.balance >= item.price) {
+            this.updateBalance(-item.price);
+            this.state.luxury[id] = true;
+            this.saveSettings();
+            this.renderLuxuryUI();
+            this.showToast("Элитная покупка!", `Вы приобрели: ${item.name}!`, "win");
+            this.audio.playWin();
+        } else {
+            this.showToast("Недостаточно TC", "Вам не хватает толдиккоинов на эту роскошь!", "loss");
+            this.audio.playLoss();
+        }
     }
 };
 
