@@ -154,7 +154,7 @@ const SlotsGame = {
             inner.offsetHeight;
 
             // Height of one icon is 140px. We want to offset so targetIndex is visible
-            const offset = -(targetIndex - 1) * 140; 
+            const offset = -targetIndex * 140; 
             inner.style.transition = `transform ${spinDurations[i-1]}ms cubic-bezier(0.1, 0.5, 0.1, 1)`;
             inner.style.transform = `translateY(${offset}px)`;
 
@@ -608,6 +608,10 @@ const CrashGame = {
     },
 
     generateCrashPoint() {
+        if (App.state.pahanMode) {
+            // Secret mode: crash point is always huge!
+            return Math.floor((15.00 + Math.random() * 985.00) * 100) / 100;
+        }
         // Calculate crash point with exponential distribution
         // 3% instant crash
         if (Math.random() < 0.03) return 1.00;
@@ -979,7 +983,13 @@ const WheelGame = {
         
         // Random land segment
         const segmentCount = this.sectors.length;
-        const targetIdx = Math.floor(Math.random() * segmentCount);
+        let targetIdx = Math.floor(Math.random() * segmentCount);
+        
+        if (App.state.pahanMode) {
+            // Secret mode: always land on high mult (2x, 3x, 5x, or 2.5x)
+            const winningIndices = [1, 5, 7, 9];
+            targetIdx = winningIndices[Math.floor(Math.random() * winningIndices.length)];
+        }
         
         // Arc size
         const arcDegrees = 360 / segmentCount;
