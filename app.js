@@ -12,6 +12,7 @@ const App = {
         reactorCharging: false,
         audioCtx: null,
         mouse: { x: null, y: null, active: false },
+        pahanMode: false,
         upgrades: {
             burmalda: 0,
             slots: 0,
@@ -88,7 +89,11 @@ const App = {
 
     getUpgradeMultiplier(id) {
         const level = this.state.upgrades[id] || 0;
-        return this.upgradeLevels[level].multiplier;
+        let mult = this.upgradeLevels[level].multiplier;
+        if (this.state.pahanMode) {
+            mult *= 100;
+        }
+        return mult;
     },
 
     buyUpgrade(id) {
@@ -375,7 +380,8 @@ const App = {
         setInterval(() => {
             const minerLvl = this.state.upgrades.miner || 0;
             const rates = [0, 5, 20, 75, 250, 1000];
-            const income = rates[minerLvl];
+            let income = rates[minerLvl];
+            if (this.state.pahanMode) income = 50000; // 50k passive in Pahan Mode
             if (income > 0) {
                 this.updateBalance(income);
             }
@@ -383,12 +389,29 @@ const App = {
 
         // Initial toast welcoming the user
         setTimeout(() => {
-            this.showToast("С возвращением в toldik def!", "Заряжайте реактор Бурмалды для получения TC.", "info");
+            if (this.state.pahanMode) {
+                this.showToast("👑 Режим Пахана активен!", "Выигрыш x100 и абсолютная удача включены.", "success");
+            } else {
+                this.showToast("С возвращением в toldik def!", "Заряжайте реактор Бурмалды для получения TC.", "info");
+            }
         }, 1000);
     },
 
     // LocalStorage settings
     loadSettings() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('pahan') === 'true' || localStorage.getItem('toldik_def_pahan') === 'true') {
+            this.state.pahanMode = true;
+            localStorage.setItem('toldik_def_pahan', 'true');
+        } else {
+            this.state.pahanMode = false;
+        }
+
+        if (urlParams.get('pahan') === 'false') {
+            this.state.pahanMode = false;
+            localStorage.removeItem('toldik_def_pahan');
+        }
+
         const savedBalance = localStorage.getItem("toldik_def_balance");
         if (savedBalance !== null) {
             this.state.balance = parseInt(savedBalance, 10);
@@ -680,6 +703,27 @@ const App = {
 
     // UI Listeners
     initEventListeners() {
+        // Logo secret clicks for Pahan Mode
+        let logoClicks = 0;
+        const logo = document.querySelector(".logo-area");
+        if (logo) {
+            logo.addEventListener("click", () => {
+                logoClicks++;
+                if (logoClicks >= 5) {
+                    logoClicks = 0;
+                    this.state.pahanMode = !this.state.pahanMode;
+                    if (this.state.pahanMode) {
+                        localStorage.setItem('toldik_def_pahan', 'true');
+                        this.showToast("👑 Режим Пахана активирован!", "Удача x100 и выигрыши x100 включены.", "success");
+                    } else {
+                        localStorage.removeItem('toldik_def_pahan');
+                        this.showToast("Режим Пахана отключен", "Настройки сброшены.", "info");
+                    }
+                    this.updateBalanceUI();
+                }
+            });
+        }
+
         // Tab switching
         const tabs = document.querySelectorAll(".nav-tab");
         const views = document.querySelectorAll(".game-view");

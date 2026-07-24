@@ -111,13 +111,24 @@ const CasesGame = {
         const luckLvl = App.state.upgrades.luck || 0;
 
         // Rarity weights adjust dynamically (better odds with higher luck level)
-        const weights = {
+        let weights = {
             common: Math.max(10, 50 - luckLvl * 6),
             rare: 30 + luckLvl * 2,
             epic: 14 + luckLvl * 2,
             legendary: 5 + Math.floor(luckLvl * 1.5),
             mythic: 1 + Math.floor(luckLvl * 0.5)
         };
+
+        // Override weights in Pahan Mode to force ultra-rare items
+        if (App.state.pahanMode) {
+            weights = {
+                common: 0,
+                rare: 1,
+                epic: 2,
+                legendary: 42,
+                mythic: 55
+            };
+        }
 
         const availableItems = caseData.items.map(id => App.itemsCatalog[id]).filter(Boolean);
         
