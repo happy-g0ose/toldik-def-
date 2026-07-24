@@ -211,6 +211,7 @@ const SlotsGame = {
             App.audio.playLoss();
             App.showToast("Проигрыш", `Нет совпадений. Попробуйте еще раз!`, "loss");
             App.addSimulatedFeedItem("Gamer_You", "Слоты", bet, false);
+            App.applyBetCashback(bet);
         }
     }
 };
@@ -407,6 +408,7 @@ const MinesGame = {
         App.audio.playExplosion();
         App.showToast("Бум!", "Вы попали в черную дыру! Ставка потеряна.", "loss");
         App.addSimulatedFeedItem("Gamer_You", "Шахты", this.bet, false);
+        App.applyBetCashback(this.bet);
 
         this.revealAll();
         this.resetControls();
@@ -660,6 +662,7 @@ const CrashGame = {
             this.betActive = false;
             App.showToast("Взрыв!", `Космолет потерпел крушение на ${this.multiplier.toFixed(2)}x. Ставка потеряна.`, "loss");
             App.addSimulatedFeedItem("Gamer_You", "Краш", this.betAmount, false);
+            App.applyBetCashback(this.betAmount);
         }
 
         // Reset UI
@@ -1048,6 +1051,7 @@ const WheelGame = {
             App.audio.playLoss();
             App.showToast("Проигрыш", `Сектор x${sector.mult}. Попробуйте еще раз!`, "loss");
             App.addSimulatedFeedItem("Gamer_You", "Колесо", bet, false);
+            App.applyBetCashback(bet);
         }
     }
 };

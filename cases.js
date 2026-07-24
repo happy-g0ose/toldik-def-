@@ -23,7 +23,8 @@ const CasesGame = {
         document.getElementById("btn-spin-case").addEventListener("click", () => {
             if (this.isSpinning || !this.selectedCaseId) return;
             const caseData = App.casesConfig[this.selectedCaseId];
-            if (App.state.balance < caseData.price) {
+            const price = App.getCasePrice(caseData.price);
+            if (App.state.balance < price) {
                 App.showToast("Недостаточно TC", "Накопите больше бурмалды!", "error");
                 App.audio.playLoss();
                 return;
@@ -59,11 +60,12 @@ const CasesGame = {
         for (const [id, caseData] of Object.entries(App.casesConfig)) {
             const card = document.createElement("div");
             card.className = "case-card glass-card";
+            const price = App.getCasePrice(caseData.price);
             card.innerHTML = `
                 <div class="case-card-icon">${caseData.icon}</div>
                 <h3>${caseData.name}</h3>
                 <div class="case-card-desc">${caseData.desc}</div>
-                <div class="case-card-price">${caseData.price.toLocaleString()} TC</div>
+                <div class="case-card-price">${price.toLocaleString()} TC</div>
             `;
             card.addEventListener("click", () => {
                 App.audio.playClick();
@@ -80,7 +82,7 @@ const CasesGame = {
         document.getElementById("cases-select-grid").style.display = "none";
         document.getElementById("case-roulette-wrapper").style.display = "block";
         document.getElementById("open-case-title").textContent = caseData.name;
-        document.getElementById("open-case-price").textContent = caseData.price.toLocaleString();
+        document.getElementById("open-case-price").textContent = App.getCasePrice(caseData.price).toLocaleString();
 
         this.renderCaseContents(caseData);
         this.buildRouletteTrack(caseData);
@@ -169,8 +171,9 @@ const CasesGame = {
         App.setNavigationEnabled(false);
 
         // Deduct price
-        App.updateBalance(-caseData.price);
-        App.addBetStat(caseData.price, false, 0);
+        const price = App.getCasePrice(caseData.price);
+        App.updateBalance(-price);
+        App.addBetStat(price, false, 0);
 
         // Pick winning item
         const winningItem = this.getRandomItemFromCase(caseData);

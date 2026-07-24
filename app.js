@@ -18,7 +18,10 @@ const App = {
             mines: 0,
             crash: 0,
             wheel: 0,
-            luck: 0
+            luck: 0,
+            miner: 0,
+            discount: 0,
+            cashback: 0
         },
         inventory: []
     },
@@ -29,7 +32,10 @@ const App = {
         mines: { name: "Саперный Радар", desc: "Множитель выигрыша в Шахтах", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93"/></svg>' },
         crash: { name: "Квантовый Двигатель", desc: "Множитель выигрыша в Краше", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l4 4-2.5-1v17h-3V5L9 6l4-4z"/></svg>' },
         wheel: { name: "Гравитационное Колесо", desc: "Множитель выигрыша в Колесе", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M12 2v7M12 15v7M2 12h7M15 12h7"/></svg>' },
-        luck: { name: "Космическое Везение", desc: "Повышает шанс редкого лута в кейсах", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4 4 4 0 0 0 4-4zm0 20a4 4 0 0 0 4-4 4 4 0 0 0-4 4zm-10-10a4 4 0 0 0 4 4 4 4 0 0 0-4-4zm20 0a4 4 0 0 0-4-4 4 4 0 0 0 4 4z"/><path d="M12 12c0 2 0 6-2 8"/></svg>' }
+        luck: { name: "Космическое Везение", desc: "Повышает шанс редкого лута в кейсах", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4 4 4 0 0 0 4-4zm0 20a4 4 0 0 0 4-4 4 4 0 0 0-4 4zm-10-10a4 4 0 0 0 4 4 4 4 0 0 0-4-4zm20 0a4 4 0 0 0-4-4 4 4 0 0 0 4 4z"/><path d="M12 12c0 2 0 6-2 8"/></svg>' },
+        miner: { name: "Квантовый Майнер", desc: "Генерирует TC пассивно каждую секунду", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"/><rect x="2" y="14" width="20" height="8" rx="2" ry="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>' },
+        discount: { name: "Кейсовая Скидка", desc: "Уменьшает стоимость открытия кейсов", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>' },
+        cashback: { name: "Звездный Кэшбэк", desc: "Возвращает часть проигранных ставок", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>' }
     },
 
     itemsCatalog: {
@@ -97,7 +103,23 @@ const App = {
             this.state.upgrades[id] = nextLevel;
             this.saveSettings();
             this.renderUpgradesUI();
-            this.showToast("Улучшение куплено!", `Ваш множитель увеличен до ${this.upgradeLevels[nextLevel].multiplier}x`, "success");
+            
+            // Custom toast message based on upgrade type
+            let message = `Ваш множитель увеличен до ${this.upgradeLevels[nextLevel].multiplier}x`;
+            if (id === 'miner') {
+                const minerRates = [0, 5, 20, 75, 250, 1000];
+                message = `Ваш пассивный доход увеличен до +${minerRates[nextLevel]} TC/сек`;
+            } else if (id === 'discount') {
+                const discountRates = [0, 5, 10, 18, 28, 45];
+                message = `Скидка на кейсы увеличена до ${discountRates[nextLevel]}%`;
+            } else if (id === 'cashback') {
+                const cashbackRates = [0, 3, 7, 12, 20, 35];
+                message = `Ваш кэшбэк увеличен до ${cashbackRates[nextLevel]}%`;
+            } else if (id === 'luck') {
+                message = `Ваша Космическая Удача прокачана до уровня ${nextLevel}`;
+            }
+
+            this.showToast("Улучшение куплено!", message, "success");
             this.audio.playWin();
             return true;
         } else {
@@ -121,6 +143,25 @@ const App = {
             let nextMultText = isMax ? "MAX" : (this.upgradeLevels[currentLevel + 1].multiplier + "x");
             let costText = isMax ? "МАКСИМУМ" : (this.upgradeLevels[currentLevel + 1].cost.toLocaleString() + " TC");
             
+            // Custom stats display text based on type
+            let currentStatText = `Множитель: <strong>${currentMult}x</strong>`;
+            if (id === 'miner') {
+                const minerRates = [0, 5, 20, 75, 250, 1000];
+                currentStatText = `Доход: <strong>+${minerRates[currentLevel]} TC/сек</strong>`;
+                nextMultText = isMax ? "MAX" : `+${minerRates[currentLevel + 1]} TC/сек`;
+            } else if (id === 'discount') {
+                const discountRates = [0, 5, 10, 18, 28, 45];
+                currentStatText = `Скидка: <strong>${discountRates[currentLevel]}%</strong>`;
+                nextMultText = isMax ? "MAX" : `${discountRates[currentLevel + 1]}%`;
+            } else if (id === 'cashback') {
+                const cashbackRates = [0, 3, 7, 12, 20, 35];
+                currentStatText = `Кэшбэк: <strong>${cashbackRates[currentLevel]}%</strong>`;
+                nextMultText = isMax ? "MAX" : `${cashbackRates[currentLevel + 1]}%`;
+            } else if (id === 'luck') {
+                currentStatText = `Везение: <strong>Lvl ${currentLevel}</strong>`;
+                nextMultText = isMax ? "MAX" : `Lvl ${currentLevel + 1}`;
+            }
+
             const card = document.createElement("div");
             card.className = "upgrade-card glass-card";
             card.innerHTML = `
@@ -129,7 +170,7 @@ const App = {
                     <h3>${config.name} <span class="upgrade-level">Lvl ${currentLevel}</span></h3>
                     <p class="upgrade-desc">${config.desc}</p>
                     <div class="upgrade-stats">
-                        <span>Множитель: <strong>${currentMult}x</strong></span>
+                        <span>${currentStatText}</span>
                         ${!isMax ? `<span>След: <strong>${nextMultText}</strong></span>` : ''}
                     </div>
                 </div>
@@ -330,6 +371,16 @@ const App = {
         this.updateStatsUI();
         this.renderUpgradesUI();
         
+        // Passive income miner loop (generates TC every second)
+        setInterval(() => {
+            const minerLvl = this.state.upgrades.miner || 0;
+            const rates = [0, 5, 20, 75, 250, 1000];
+            const income = rates[minerLvl];
+            if (income > 0) {
+                this.updateBalance(income);
+            }
+        }, 1000);
+
         // Initial toast welcoming the user
         setTimeout(() => {
             this.showToast("С возвращением в toldik def!", "Заряжайте реактор Бурмалды для получения TC.", "info");
@@ -394,6 +445,29 @@ const App = {
         if (this.state.balance < 0) this.state.balance = 0;
         this.saveSettings();
         this.updateBalanceUI();
+    },
+
+    getCasePrice(basePrice) {
+        const discountRates = [0, 0.05, 0.10, 0.18, 0.28, 0.45];
+        const discountLvl = this.state.upgrades.discount || 0;
+        const discountPercent = discountRates[discountLvl];
+        return Math.floor(basePrice * (1 - discountPercent));
+    },
+
+    applyBetCashback(betAmount) {
+        if (betAmount <= 0) return;
+        const cashbackRates = [0, 0.03, 0.07, 0.12, 0.20, 0.35];
+        const cashbackLvl = this.state.upgrades.cashback || 0;
+        const cashbackPercent = cashbackRates[cashbackLvl];
+        if (cashbackPercent > 0) {
+            const cashbackAmount = Math.floor(betAmount * cashbackPercent);
+            if (cashbackAmount > 0) {
+                setTimeout(() => {
+                    this.updateBalance(cashbackAmount);
+                    this.showToast("Кэшбэк!", `Космический кэшбэк вернул вам +${cashbackAmount.toLocaleString()} TC`, "info");
+                }, 800);
+            }
+        }
     },
 
     updateBalanceUI() {
