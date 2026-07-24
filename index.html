@@ -39,6 +39,10 @@
                     <span class="currency-symbol">TC</span>
                 </div>
                 
+                <button class="btn btn-secondary" id="btn-inventory" style="display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-box"></i> Инвентарь <span class="badge" id="inventory-count">0</span>
+                </button>
+
                 <button class="btn btn-primary glow-btn-malachite" id="btn-burmaldit">
                     <i class="fa-solid fa-bolt-lightning"></i> Бурмалдить
                 </button>
@@ -100,6 +104,9 @@
                     </button>
                     <button class="nav-tab" data-game="wheel">
                         <i class="fa-solid fa-circle-notch"></i> Колесо
+                    </button>
+                    <button class="nav-tab" data-game="cases">
+                        <i class="fa-solid fa-box-open"></i> Кейсы
                     </button>
                     <button class="nav-tab" data-game="upgrades" style="margin-left: auto; border: 1px solid var(--color-malachite); color: var(--color-malachite);">
                         <i class="fa-solid fa-arrow-up-right-dots"></i> Улучшения
@@ -280,6 +287,43 @@
                         </div>
                     </div>
 
+                    <!-- GAME 6: CASES -->
+                    <div class="game-view" id="game-cases">
+                        <div class="slots-header">
+                            <h2 style="background: linear-gradient(90deg, #fff, var(--color-malachite)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Кейсы Бурмалды</h2>
+                            <p>Выбивайте эксклюзивные предметы и ценный лут!</p>
+                        </div>
+
+                        <!-- Cases Grid -->
+                        <div class="cases-grid" id="cases-select-grid">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <!-- Case Roulette Opener View (hidden by default) -->
+                        <div class="case-roulette-wrapper" id="case-roulette-wrapper" style="display: none;">
+                            <button class="btn btn-sm btn-ghost" id="btn-back-to-cases" style="margin-bottom: 15px;">← Назад к кейсам</button>
+                            <h3 id="open-case-title" style="margin-bottom: 20px;">Кейс</h3>
+                            
+                            <div class="roulette-container glass-card">
+                                <div class="roulette-pointer"></div>
+                                <div class="roulette-track" id="roulette-track">
+                                    <!-- Dynamic roulette cards -->
+                                </div>
+                            </div>
+
+                            <div class="case-open-controls" style="margin-top: 25px; text-align: center;">
+                                <button class="btn btn-action glow-btn-malachite btn-large" id="btn-spin-case">
+                                    Открыть за <span id="open-case-price">0</span> TC
+                                </button>
+                            </div>
+
+                            <div class="case-contents-preview" style="margin-top: 35px;">
+                                <h4>Содержимое кейса:</h4>
+                                <div class="contents-grid" id="case-contents-grid"></div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </section>
         </main>
@@ -313,11 +357,26 @@
         </div>
     </div>
 
+    <!-- Inventory Modal -->
+    <div class="modal-overlay" id="inventory-modal">
+        <div class="modal-content glass-card" style="max-width: 650px;">
+            <button class="close-modal-btn" id="close-inventory"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-header">
+                <h2>Ваш Инвентарь</h2>
+                <p>Предметы бурмалды, которые вы выбили из кейсов</p>
+            </div>
+            <div class="inventory-grid" id="inventory-grid">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
     <!-- Notification system toast -->
     <div id="toast-container" class="toast-container"></div>
 
     <!-- JS Files -->
     <script src="app.js"></script>
     <script src="games.js"></script>
+    <script src="cases.js"></script>
 </body>
 </html>

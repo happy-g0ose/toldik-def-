@@ -18,7 +18,8 @@ const App = {
             mines: 0,
             crash: 0,
             wheel: 0
-        }
+        },
+        inventory: []
     },
 
     upgradesConfig: {
@@ -27,6 +28,45 @@ const App = {
         mines: { name: "Саперный Радар", desc: "Множитель выигрыша в Шахтах", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93"/></svg>' },
         crash: { name: "Квантовый Двигатель", desc: "Множитель выигрыша в Краше", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l4 4-2.5-1v17h-3V5L9 6l4-4z"/></svg>' },
         wheel: { name: "Гравитационное Колесо", desc: "Множитель выигрыша в Колесе", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M12 2v7M12 15v7M2 12h7M15 12h7"/></svg>' }
+    },
+
+    itemsCatalog: {
+        hedgehog: { id: "hedgehog", name: "Колючий Ежик", rarity: "common", price: 200, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10c0 5.5-4.5 10-10 10S2 17.5 2 12A10 10 0 0 1 12 2z"/><path d="M7 8l2 2M15 8l2 2M9 15s1.5 2 3 2 3-2 3-2M5 12h.01M19 12h.01M12 4v2M12 18v2M4 7l2 1M18 7l-2 1"/></svg>' },
+        underwear: { id: "underwear", name: "Счастливые Трусы", rarity: "common", price: 350, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v6c0 6-4 10-8 10S4 16 4 10V4z"/><path d="M4 10h16M12 10v10"/></svg>' },
+        glasses: { id: "glasses", name: "Очки Бурмалды", rarity: "common", price: 500, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="12" r="4"/><circle cx="18" cy="12" r="4"/><path d="M10 12h4M2 12h0M22 12h0"/></svg>' },
+        windows: { id: "windows", name: "Наши Окна", rarity: "rare", price: 1500, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M3 12h18"/></svg>' },
+        poster: { id: "poster", name: "Плакат Толдика", rarity: "rare", price: 3000, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="10" r="3"/><path d="M7 18c0-2.5 2.5-4 5-4s5 1.5 5 4"/></svg>' },
+        reactor_item: { id: "reactor_item", name: "Мини-Реактор", rarity: "epic", price: 8000, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M12 15v6M3 12h6M15 12h6"/></svg>' },
+        crystal_item: { id: "crystal_item", name: "Малахитовый Артефакт", rarity: "epic", price: 15000, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l4 6-10 12L2 9z"/></svg>' },
+        golden_toldik: { id: "golden_toldik", name: "Золотой Толдик", rarity: "legendary", price: 50000, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/><path d="M5 20h14"/></svg>' },
+        singular_goose: { id: "singular_goose", name: "Сингулярная Бурмалда", rarity: "mythic", price: 200000, icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>' }
+    },
+
+    casesConfig: {
+        hobo: {
+            id: "hobo",
+            name: "Бомж Кейс",
+            price: 500,
+            desc: "Дешевый кейс с базовой бурмалдой",
+            icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+            items: ["hedgehog", "underwear", "glasses", "windows"]
+        },
+        burmalda_case: {
+            id: "burmalda_case",
+            name: "Кейс Бурмалды",
+            price: 2500,
+            desc: "Народный выбор с высоким шансом редких вещей",
+            icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>',
+            items: ["underwear", "glasses", "windows", "poster", "reactor_item"]
+        },
+        malachite_case: {
+            id: "malachite_case",
+            name: "Малахитовый Кейс",
+            price: 10000,
+            desc: "Премиальный кейс для настоящих паханов",
+            icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="12"/><line x1="22" y1="8.5" x2="12" y2="12"/><line x1="2" y1="8.5" x2="12" y2="12"/></svg>',
+            items: ["windows", "poster", "reactor_item", "crystal_item", "golden_toldik", "singular_goose"]
+        }
     },
 
     upgradeLevels: [
@@ -97,6 +137,56 @@ const App = {
             `;
             container.appendChild(card);
         }
+    },
+
+    addToInventory(itemId) {
+        const item = this.itemsCatalog[itemId];
+        if (!item) return;
+        this.state.inventory.push({ ...item, uid: Date.now() + Math.random() });
+        this.saveSettings();
+        this.updateInventoryCountUI();
+    },
+
+    sellInventoryItem(index) {
+        if (index < 0 || index >= this.state.inventory.length) return;
+        const item = this.state.inventory[index];
+        this.state.inventory.splice(index, 1);
+        this.updateBalance(item.price);
+        this.saveSettings();
+        this.updateInventoryCountUI();
+        this.renderInventoryUI();
+        this.showToast("Продано!", `Вы получили +${item.price.toLocaleString()} TC за ${item.name}`, "win");
+        this.audio.playWin();
+    },
+
+    updateInventoryCountUI() {
+        const badge = document.getElementById("inventory-count");
+        if (badge) {
+            badge.textContent = this.state.inventory.length;
+        }
+    },
+
+    renderInventoryUI() {
+        const container = document.getElementById("inventory-grid");
+        if (!container) return;
+
+        if (this.state.inventory.length === 0) {
+            container.innerHTML = `<div class="inventory-empty">Инвентарь пуст. Открывайте кейсы!</div>`;
+            return;
+        }
+
+        container.innerHTML = "";
+        this.state.inventory.forEach((item, index) => {
+            const card = document.createElement("div");
+            card.className = `inventory-item-card rarity-${item.rarity}`;
+            card.innerHTML = `
+                <div class="item-icon">${item.icon}</div>
+                <div class="item-name">${item.name}</div>
+                <div class="item-price">+${item.price.toLocaleString()} TC</div>
+                <button class="btn btn-sm btn-ghost" onclick="App.sellInventoryItem(${index})">Продать</button>
+            `;
+            container.appendChild(card);
+        });
     },
 
     // Audio Synthesizer via Web Audio API
@@ -274,8 +364,18 @@ const App = {
                 console.error("Failed to parse upgrades", e);
             }
         }
+
+        const savedInventory = localStorage.getItem("toldik_def_inventory");
+        if (savedInventory !== null) {
+            try {
+                this.state.inventory = JSON.parse(savedInventory);
+            } catch (e) {
+                console.error("Failed to parse inventory", e);
+            }
+        }
         
         this.updateBalanceUI();
+        this.updateInventoryCountUI();
     },
 
     saveSettings() {
@@ -284,6 +384,7 @@ const App = {
         localStorage.setItem("toldik_def_losses", this.state.losses);
         localStorage.setItem("toldik_def_total_bets", this.state.totalBets);
         localStorage.setItem("toldik_def_upgrades", JSON.stringify(this.state.upgrades));
+        localStorage.setItem("toldik_def_inventory", JSON.stringify(this.state.inventory));
     },
 
     updateBalance(change) {
