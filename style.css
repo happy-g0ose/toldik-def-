@@ -1613,7 +1613,7 @@ input[type="number"]:focus, select:focus {
     justify-content: center;
     padding: 8px;
     text-align: center;
-    box-sizing: border-border;
+    box-sizing: border-box;
     position: relative;
     overflow: hidden;
 }
