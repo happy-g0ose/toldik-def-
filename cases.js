@@ -108,7 +108,14 @@ const CasesGame = {
 
     getRandomItemFromCase(caseData) {
         // Fetch luck upgrade level
-        const luckLvl = App.state.upgrades.luck || 0;
+        let luckLvl = App.state.upgrades.luck || 0;
+
+        // Apply Rank Luck Boosts (Losses reward more than wins!)
+        const wins = App.state.wins || 0;
+        const losses = App.state.losses || 0;
+        const winBoost = 1 + Math.floor(wins / 100) * 0.1;
+        const lossBoost = 1 + Math.floor(losses / 100) * 0.2;
+        luckLvl = luckLvl * winBoost * lossBoost;
 
         // Rarity weights adjust dynamically (better odds with higher luck level)
         let weights = {

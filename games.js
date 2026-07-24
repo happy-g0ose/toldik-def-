@@ -418,7 +418,9 @@ const MinesGame = {
         if (!this.active) return;
         this.active = false;
 
-        const profit = Math.floor(this.bet * this.multiplier * App.getUpgradeMultiplier('mines'));
+        let upgradeMult = App.getUpgradeMultiplier('mines');
+        if (App.state.luxury.villa) upgradeMult *= 1.5;
+        const profit = Math.floor(this.bet * this.multiplier * upgradeMult);
         App.updateBalance(profit);
         App.state.losses = Math.max(0, App.state.losses - 1);
         App.addBetStat(0, true, profit);
