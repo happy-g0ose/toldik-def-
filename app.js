@@ -625,6 +625,12 @@ const App = {
                 if (gameName === "wheel" && window.WheelGame) {
                     window.WheelGame.onShow();
                 }
+                if (gameName === "cases" && window.CasesGame) {
+                    window.CasesGame.renderCasesList();
+                }
+                if (gameName === "upgrades") {
+                    this.renderUpgradesUI();
+                }
             });
         });
 

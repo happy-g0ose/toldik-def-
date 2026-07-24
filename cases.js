@@ -47,7 +47,13 @@ const CasesGame = {
 
     renderCasesList() {
         const grid = document.getElementById("cases-select-grid");
-        if (!grid) return;
+        const wrapper = document.getElementById("case-roulette-wrapper");
+        if (!grid || !App.casesConfig) return;
+
+        if (wrapper && !this.isSpinning) {
+            wrapper.style.display = "none";
+            grid.style.display = "grid";
+        }
 
         grid.innerHTML = "";
         for (const [id, caseData] of Object.entries(App.casesConfig)) {
