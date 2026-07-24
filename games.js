@@ -157,7 +157,7 @@ const SlotsGame = {
         if (r1.char === r2.char && r2.char === r3.char) {
             // Triple win!
             const winMult = r1.mult;
-            const profit = bet * winMult;
+            const profit = Math.floor(bet * winMult * App.getUpgradeMultiplier('slots'));
             
             App.updateBalance(profit);
             // Fix double stat: we marked it as loss before, now correct stats
@@ -173,7 +173,7 @@ const SlotsGame = {
             const matchedChar = r1.char === r2.char ? r1.char : r3.char;
             const matchedSymbol = this.symbols.find(s => s.char === matchedChar);
             const winMult = Math.ceil(matchedSymbol.mult * 0.4);
-            const profit = Math.floor(bet * winMult);
+            const profit = Math.floor(bet * winMult * App.getUpgradeMultiplier('slots'));
 
             App.updateBalance(profit);
             App.state.losses = Math.max(0, App.state.losses - 1);
@@ -383,7 +383,7 @@ const MinesGame = {
         if (!this.active) return;
         this.active = false;
 
-        const profit = Math.floor(this.bet * this.multiplier);
+        const profit = Math.floor(this.bet * this.multiplier * App.getUpgradeMultiplier('mines'));
         App.updateBalance(profit);
         App.state.losses = Math.max(0, App.state.losses - 1);
         App.addBetStat(0, true, profit);
@@ -538,7 +538,7 @@ const CrashGame = {
         
         this.betActive = false;
         this.cashoutMultiplier = this.multiplier;
-        const profit = Math.floor(this.betAmount * this.cashoutMultiplier);
+        const profit = Math.floor(this.betAmount * this.cashoutMultiplier * App.getUpgradeMultiplier('crash'));
 
         App.updateBalance(profit);
         App.state.losses = Math.max(0, App.state.losses - 1);
@@ -990,7 +990,7 @@ const WheelGame = {
         this.canvas.style.transition = "transform 5s cubic-bezier(0.1, 0.8, 0.1, 1)"; // restore
 
         const sector = this.sectors[targetIdx];
-        const profit = Math.floor(bet * sector.mult);
+        const profit = Math.floor(bet * sector.mult * App.getUpgradeMultiplier('wheel'));
 
         if (sector.mult > 1.0) {
             // Profit win!

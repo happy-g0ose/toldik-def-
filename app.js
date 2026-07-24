@@ -11,7 +11,92 @@ const App = {
         soundEnabled: true,
         reactorCharging: false,
         audioCtx: null,
-        mouse: { x: null, y: null, active: false }
+        mouse: { x: null, y: null, active: false },
+        upgrades: {
+            burmalda: 0,
+            slots: 0,
+            mines: 0,
+            crash: 0,
+            wheel: 0
+        }
+    },
+
+    upgradesConfig: {
+        burmalda: { name: "Бурмалдовый Генератор", desc: "Увеличивает добычу от Бурмалды", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>' },
+        slots: { name: "Слот-Машинный Чип", desc: "Множитель выигрыша в Слотах", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="8.5" r="1.5"/><circle cx="15.5" cy="15.5" r="1.5"/><circle cx="8.5" cy="15.5" r="1.5"/></svg>' },
+        mines: { name: "Саперный Радар", desc: "Множитель выигрыша в Шахтах", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07L19.07 4.93"/></svg>' },
+        crash: { name: "Квантовый Двигатель", desc: "Множитель выигрыша в Краше", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l4 4-2.5-1v17h-3V5L9 6l4-4z"/></svg>' },
+        wheel: { name: "Гравитационное Колесо", desc: "Множитель выигрыша в Колесе", icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><path d="M12 2v7M12 15v7M2 12h7M15 12h7"/></svg>' }
+    },
+
+    upgradeLevels: [
+        { cost: 0, multiplier: 1.0 },
+        { cost: 20000, multiplier: 1.2 },
+        { cost: 75000, multiplier: 1.5 },
+        { cost: 200000, multiplier: 2.0 },
+        { cost: 500000, multiplier: 3.0 },
+        { cost: 1000000, multiplier: 5.0 }
+    ],
+
+    getUpgradeMultiplier(id) {
+        const level = this.state.upgrades[id] || 0;
+        return this.upgradeLevels[level].multiplier;
+    },
+
+    buyUpgrade(id) {
+        const currentLevel = this.state.upgrades[id] || 0;
+        if (currentLevel >= this.upgradeLevels.length - 1) return false;
+        
+        const nextLevel = currentLevel + 1;
+        const cost = this.upgradeLevels[nextLevel].cost;
+        
+        if (this.state.balance >= cost) {
+            this.updateBalance(-cost);
+            this.state.upgrades[id] = nextLevel;
+            this.saveSettings();
+            this.renderUpgradesUI();
+            this.showToast("Улучшение куплено!", `Ваш множитель увеличен до ${this.upgradeLevels[nextLevel].multiplier}x`, "success");
+            this.audio.playWin();
+            return true;
+        } else {
+            this.showToast("Недостаточно TC", "Накопите больше бурмалды", "error");
+            this.audio.playLoss();
+            return false;
+        }
+    },
+
+    renderUpgradesUI() {
+        const container = document.getElementById("upgrades-grid");
+        if (!container) return;
+        
+        container.innerHTML = "";
+        
+        for (const [id, config] of Object.entries(this.upgradesConfig)) {
+            const currentLevel = this.state.upgrades[id] || 0;
+            const currentMult = this.upgradeLevels[currentLevel].multiplier;
+            const isMax = currentLevel >= this.upgradeLevels.length - 1;
+            
+            let nextMultText = isMax ? "MAX" : (this.upgradeLevels[currentLevel + 1].multiplier + "x");
+            let costText = isMax ? "МАКСИМУМ" : (this.upgradeLevels[currentLevel + 1].cost.toLocaleString() + " TC");
+            
+            const card = document.createElement("div");
+            card.className = "upgrade-card glass-card";
+            card.innerHTML = `
+                <div class="upgrade-icon">${config.icon}</div>
+                <div class="upgrade-info">
+                    <h3>${config.name} <span class="upgrade-level">Lvl ${currentLevel}</span></h3>
+                    <p class="upgrade-desc">${config.desc}</p>
+                    <div class="upgrade-stats">
+                        <span>Множитель: <strong>${currentMult}x</strong></span>
+                        ${!isMax ? `<span>След: <strong>${nextMultText}</strong></span>` : ''}
+                    </div>
+                </div>
+                <button class="btn btn-action ${isMax ? 'disabled' : ''}" onclick="App.buyUpgrade('${id}')" ${isMax ? 'disabled' : ''}>
+                    ${costText}
+                </button>
+            `;
+            container.appendChild(card);
+        }
     },
 
     // Audio Synthesizer via Web Audio API
@@ -151,6 +236,7 @@ const App = {
         this.initEventListeners();
         this.startLiveFeedSimulation();
         this.updateStatsUI();
+        this.renderUpgradesUI();
         
         // Initial toast welcoming the user
         setTimeout(() => {
@@ -180,6 +266,15 @@ const App = {
         const savedTotalBets = localStorage.getItem("toldik_def_total_bets");
         if (savedTotalBets !== null) this.state.totalBets = parseInt(savedTotalBets, 10);
         
+        const savedUpgrades = localStorage.getItem("toldik_def_upgrades");
+        if (savedUpgrades !== null) {
+            try {
+                this.state.upgrades = JSON.parse(savedUpgrades);
+            } catch (e) {
+                console.error("Failed to parse upgrades", e);
+            }
+        }
+        
         this.updateBalanceUI();
     },
 
@@ -188,6 +283,7 @@ const App = {
         localStorage.setItem("toldik_def_wins", this.state.wins);
         localStorage.setItem("toldik_def_losses", this.state.losses);
         localStorage.setItem("toldik_def_total_bets", this.state.totalBets);
+        localStorage.setItem("toldik_def_upgrades", JSON.stringify(this.state.upgrades));
     },
 
     updateBalance(change) {
@@ -502,11 +598,13 @@ const App = {
                 triggerBtn.disabled = false;
                 chargeBar.style.width = "0%";
                 
-                // Random prize toldikcoins
                 const baseReward = 500;
                 const isLucky = Math.random() < 0.15; // 15% jackpot chance
                 const luckyMultiplier = isLucky ? 3 : 1;
-                const reward = Math.floor((Math.random() * 500 + baseReward) * luckyMultiplier);
+                let reward = Math.floor((Math.random() * 500 + baseReward) * luckyMultiplier);
+                
+                // Apply Burmalda Generator Upgrade
+                reward = Math.floor(reward * this.getUpgradeMultiplier('burmalda'));
 
                 this.updateBalance(reward);
                 

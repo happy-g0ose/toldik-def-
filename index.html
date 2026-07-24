@@ -101,6 +101,9 @@
                     <button class="nav-tab" data-game="wheel">
                         <i class="fa-solid fa-circle-notch"></i> Колесо
                     </button>
+                    <button class="nav-tab" data-game="upgrades" style="margin-left: auto; border: 1px solid var(--color-malachite); color: var(--color-malachite);">
+                        <i class="fa-solid fa-arrow-up-right-dots"></i> Улучшения
+                    </button>
                 </nav>
 
                 <!-- Game Container -->
@@ -263,6 +266,17 @@
                                     <canvas id="wheel-canvas" width="450" height="450"></canvas>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- GAME 5: UPGRADES -->
+                    <div class="game-view" id="game-upgrades">
+                        <div class="slots-header">
+                            <h2 style="background: linear-gradient(90deg, #fff, var(--color-malachite)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Магазин Улучшений</h2>
+                            <p>Повышайте множители заработка TC навсегда!</p>
+                        </div>
+                        <div class="upgrades-grid" id="upgrades-grid">
+                            <!-- Populated by JS -->
                         </div>
                     </div>
 
