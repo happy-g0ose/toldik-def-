@@ -105,13 +105,16 @@ const CasesGame = {
     },
 
     getRandomItemFromCase(caseData) {
-        // Rarity weights
+        // Fetch luck upgrade level
+        const luckLvl = App.state.upgrades.luck || 0;
+
+        // Rarity weights adjust dynamically (better odds with higher luck level)
         const weights = {
-            common: 50,
-            rare: 30,
-            epic: 14,
-            legendary: 5,
-            mythic: 1
+            common: Math.max(10, 50 - luckLvl * 6),
+            rare: 30 + luckLvl * 2,
+            epic: 14 + luckLvl * 2,
+            legendary: 5 + Math.floor(luckLvl * 1.5),
+            mythic: 1 + Math.floor(luckLvl * 0.5)
         };
 
         const availableItems = caseData.items.map(id => App.itemsCatalog[id]).filter(Boolean);

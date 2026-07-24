@@ -87,6 +87,22 @@ const SlotsGame = {
         App.updateBalance(-bet);
         App.addBetStat(bet, false, 0);
 
+        // Pre-determine reel target symbols with Luck upgrade boost
+        let r1Sym = this.symbols[Math.floor(Math.random() * this.symbols.length)];
+        let r2Sym = this.symbols[Math.floor(Math.random() * this.symbols.length)];
+        let r3Sym = this.symbols[Math.floor(Math.random() * this.symbols.length)];
+
+        const luckLvl = App.state.upgrades.luck || 0;
+        if (luckLvl > 0 && Math.random() < (luckLvl * 0.05)) {
+            if (r1Sym.char === r2Sym.char) r3Sym = r1Sym;
+            else if (r2Sym.char === r3Sym.char) r1Sym = r2Sym;
+            else if (r1Sym.char === r3Sym.char) r2Sym = r1Sym;
+            else {
+                r2Sym = r1Sym; // force at least a pair
+            }
+        }
+
+        const reelTargets = [r1Sym, r2Sym, r3Sym];
         const reelDests = [];
         const spinDurations = [1500, 2200, 2900]; // Staggered stops
 
@@ -106,9 +122,17 @@ const SlotsGame = {
                 inner.appendChild(this.createSymbolDOM(sym));
             }
 
-            // The target symbol is the 3rd from the end (centered in reel window)
+            // Replace target symbol index with our pre-determined symbol
             const targetIndex = stripCount - 2;
-            const targetSymbol = reelSymbols[targetIndex];
+            const targetSymbol = reelTargets[i - 1];
+            reelSymbols[targetIndex] = targetSymbol;
+            
+            // Re-render only that target symbol DOM element to match
+            const targetNode = inner.childNodes[targetIndex];
+            if (targetNode) {
+                targetNode.innerHTML = `${targetSymbol.char} <span>${targetSymbol.name}</span>`;
+            }
+            
             reelDests.push(targetSymbol);
 
             // Animate scroll using simple translate
@@ -321,6 +345,15 @@ const MinesGame = {
         if (tile.classList.contains("revealed")) return;
 
         tile.classList.add("revealed");
+
+        if (this.grid[idx] === "bomb") {
+            const luckLvl = App.state.upgrades.luck || 0;
+            if (luckLvl > 0 && Math.random() < (luckLvl * 0.025)) {
+                this.grid[idx] = "crystal";
+                App.showToast("Удача!", "Космическое Везение обезвредило черную дыру!", "win");
+                App.audio.playTone(800, 'sine', 0.15);
+            }
+        }
 
         if (this.grid[idx] === "bomb") {
             // Exploded!
