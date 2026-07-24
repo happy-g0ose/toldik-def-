@@ -103,6 +103,9 @@ const App = {
         if (this.state.pahanMode) {
             mult *= 100;
         }
+        if (this.state.luxury.matrix) {
+            mult *= 3; // Matrix bought -> 3x to all multiplier upgrades!
+        }
         return mult;
     },
 
@@ -393,6 +396,8 @@ const App = {
             const rates = [0, 5, 20, 75, 250, 1000];
             let income = rates[minerLvl];
             if (this.state.pahanMode) income = 50000; // 50k passive in Pahan Mode
+            if (this.state.luxury.yacht) income += 500; // Yacht bonus (+500 TC/s)
+            if (this.state.luxury.empire) income *= 2; // Empire bonus (2x)
             if (income > 0) {
                 this.updateBalance(income);
             }
@@ -495,14 +500,21 @@ const App = {
         const discountRates = [0, 0.05, 0.10, 0.18, 0.28, 0.45];
         const discountLvl = this.state.upgrades.discount || 0;
         const discountPercent = discountRates[discountLvl];
-        return Math.floor(basePrice * (1 - discountPercent));
+        let price = Math.floor(basePrice * (1 - discountPercent));
+        if (this.state.luxury.planet) {
+            price = Math.floor(price * 0.80); // additional 20% discount!
+        }
+        return price;
     },
 
     applyBetCashback(betAmount) {
         if (betAmount <= 0) return;
         const cashbackRates = [0, 0.03, 0.07, 0.12, 0.20, 0.35];
         const cashbackLvl = this.state.upgrades.cashback || 0;
-        const cashbackPercent = cashbackRates[cashbackLvl];
+        let cashbackPercent = cashbackRates[cashbackLvl];
+        if (this.state.luxury.blackhole) {
+            cashbackPercent += 0.10; // Black Hole gives +10% cashback rate!
+        }
         if (cashbackPercent > 0) {
             const cashbackAmount = Math.floor(betAmount * cashbackPercent);
             if (cashbackAmount > 0) {
@@ -558,6 +570,24 @@ const App = {
         document.getElementById("stat-wins").textContent = this.state.wins;
         document.getElementById("stat-losses").textContent = this.state.losses;
         document.getElementById("stat-total-bets").textContent = this.state.totalBets.toLocaleString() + " TC";
+
+        // Calculate Rank Title based on total games
+        const totalGames = this.state.wins + this.state.losses;
+        let rank = "Новичок";
+        if (totalGames > 1500) rank = "👑 Царь Бурмалды";
+        else if (totalGames > 500) rank = "🌌 Магистр Азарта";
+        else if (totalGames > 150) rank = "🎰 Опытный Лудоман";
+        else if (totalGames > 50) rank = "🧪 Бурмальщик";
+        else if (totalGames > 10) rank = "🎲 Любитель";
+
+        // Calculate active boosters
+        const winBoost = Math.floor(this.state.wins / 100) * 10;
+        const lossBoost = Math.floor(this.state.losses / 100) * 20;
+
+        const rankTitleEl = document.getElementById("sidebar-rank-title");
+        const rankBoostsEl = document.getElementById("sidebar-rank-boosts");
+        if (rankTitleEl) rankTitleEl.textContent = rank;
+        if (rankBoostsEl) rankBoostsEl.textContent = `Удача: +${winBoost}% (Победы) / +${lossBoost}% (Сливы!)`;
     },
 
     updateSoundIcon() {
